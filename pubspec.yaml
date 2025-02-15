@@ -1,0 +1,22 @@
+name: safeats3
+description: "A food allergen detection app that uses machine learning to detect allergens in food."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ^3.6.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_ml_kit: ^0.19.0
+  image_cropper: ^9.0.0
+  image_picker: ^1.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
