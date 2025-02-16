@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:safeeats/screens/result_screen.dart';
+import 'package:safeeats/services/api_sevice.dart';
 
 class BarcodeScannerPage extends StatefulWidget {
   const BarcodeScannerPage({super.key});
@@ -11,6 +12,64 @@ class BarcodeScannerPage extends StatefulWidget {
 
 class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   MobileScannerController cameraController = MobileScannerController();
+  final FoodApiService _apiService = FoodApiService();
+  bool _isProcessing = false;
+
+  void _processBarcode(String? barcodeData) async {
+    if (_isProcessing) return;
+
+    setState(() {
+      _isProcessing = true;
+    });
+
+    if (barcodeData == null || int.tryParse(barcodeData) == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid barcode scanned'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      Navigator.of(context).pop();
+      return;
+    }
+
+    try {
+      final productInfo = await _apiService.getProductInfo(barcodeData);
+      if (!mounted) return;
+
+      if (productInfo.status == 1) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResultPage(productInfo: productInfo),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Product not found'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      Navigator.of(context).pop();
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isProcessing = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,30 +83,30 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
             controller: cameraController,
             onDetect: (capture) {
               final List<Barcode> barcodes = capture.barcodes;
-              if (barcodes.isNotEmpty) {
-                final barcode = barcodes.first;
-                cameraController.stop();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ResultPage(
-                      barcodeData: barcode.rawValue ?? 'No data found',
-                    ),
-                  ),
-                );
+              for (final barcode in barcodes) {
+                _processBarcode(barcode.rawValue);
               }
             },
           ),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.white,
-                width: 2,
+          Center(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.white,
+                  width: 2,
+                ),
+              ),
+              width: 200,
+              height: 200,
+            ),
+          ),
+          if (_isProcessing)
+            Container(
+              color: Colors.black54,
+              child: const Center(
+                child: CircularProgressIndicator(),
               ),
             ),
-            width: 200,
-            height: 200,
-          ),
         ],
       ),
     );
