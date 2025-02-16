@@ -24,15 +24,18 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
             controller: cameraController,
             onDetect: (capture) {
               final List<Barcode> barcodes = capture.barcodes;
-              final barcode = barcodes[0];
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ResultPage(
-                    barcodeData: barcode.rawValue ?? 'No data found',
+              if (barcodes.isNotEmpty) {
+                final barcode = barcodes.first;
+                cameraController.stop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ResultPage(
+                      barcodeData: barcode.rawValue ?? 'No data found',
+                    ),
                   ),
-                ),
-              );
+                );
+              }
             },
           ),
           Container(
