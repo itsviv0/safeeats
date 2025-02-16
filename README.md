@@ -1,3 +1,3 @@
-# safeats3
+# safeeats
 
 A new Flutter project.

@@ -1,4 +1,4 @@
-package com.example.safeats3
+package com.example.safeeats
 
 import io.flutter.embedding.android.FlutterActivity
 

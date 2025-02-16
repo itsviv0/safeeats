@@ -1,4 +1,4 @@
-name: safeats3
+name: safeeats
 description: "A food allergen detection app that uses machine learning to detect allergens in food."
 publish_to: "none"
 version: 0.1.0
