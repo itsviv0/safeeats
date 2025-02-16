@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:safeeats/screens/result_screen.dart';
+import 'package:safeeats/screens/barcode_result_screen.dart';
 import 'package:safeeats/services/api_sevice.dart';
 
 class BarcodeScannerPage extends StatefulWidget {
@@ -55,13 +55,12 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: ${e.toString()}'),
-          backgroundColor: Colors.red,
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const IngredientsScannerPage(),
         ),
       );
-      Navigator.of(context).pop();
     } finally {
       if (mounted) {
         setState(() {
