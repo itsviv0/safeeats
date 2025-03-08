@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:safeeats/screens/barcode_result_screen.dart';
+import 'package:safeeats/screens/ingredient_scanner_screen.dart';
 import 'package:safeeats/services/api_sevice.dart';
 
 class BarcodeScannerPage extends StatefulWidget {
