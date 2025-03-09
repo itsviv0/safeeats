@@ -30,7 +30,12 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
           backgroundColor: Colors.red,
         ),
       );
-      Navigator.of(context).pop();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const IngredientsScannerPage(),
+        ),
+      );
       return;
     }
 
