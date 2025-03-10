@@ -3,6 +3,7 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safeeats/screens/manual_result_screen.dart';
+import 'package:safeeats/services/model_interaction.dart';
 
 class IngredientsScannerPage extends StatefulWidget {
   const IngredientsScannerPage({super.key});
@@ -15,6 +16,30 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
   final List<String> scannedIngredients = [];
   bool isScanning = false;
   final textRecognizer = GoogleMlKit.vision.textRecognizer();
+
+  Future<void> _processAndAddIngredients(List<String> rawIngredients) async {
+    try {
+      // Process ingredients through Python service
+      final processedIngredients =
+          await IngredientProcessor.processIngredients(rawIngredients);
+
+      setState(() {
+        scannedIngredients.addAll(processedIngredients);
+        isScanning = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error processing ingredients. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        isScanning = false;
+      });
+    }
+  }
 
   Future<void> _scanIngredients() async {
     final ImagePicker picker = ImagePicker();
@@ -46,6 +71,8 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
           .where((ingredient) => ingredient.isNotEmpty)
           .toList();
 
+      await _processAndAddIngredients(newIngredients); // Add this line
+
       setState(() {
         scannedIngredients.addAll(newIngredients);
         isScanning = false;
@@ -55,6 +82,55 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error scanning ingredients. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        isScanning = false;
+      });
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    final ImagePicker picker = ImagePicker();
+
+    try {
+      setState(() {
+        isScanning = true;
+      });
+
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      if (image == null) {
+        setState(() {
+          isScanning = false;
+        });
+        return;
+      }
+
+      final inputImage = InputImage.fromFilePath(image.path);
+      final RecognizedText recognizedText =
+          await textRecognizer.processImage(inputImage);
+
+      // Process the recognized text
+      String ingredients = recognizedText.text;
+
+      List<String> newIngredients = ingredients
+          .split(RegExp(r'[,.]'))
+          .map((ingredient) => ingredient.trim())
+          .where((ingredient) => ingredient.isNotEmpty)
+          .toList();
+
+      await _processAndAddIngredients(newIngredients);
+
+      setState(() {
+        scannedIngredients.addAll(newIngredients);
+        isScanning = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error processing image. Please try again.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -139,24 +215,53 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
         ],
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            ElevatedButton.icon(
-              onPressed: isScanning ? null : _scanIngredients,
-              icon: const Icon(Icons.camera_alt),
-              label: Text(
-                isScanning ? 'Scanning...' : 'Scan More',
-                style: GoogleFonts.poppins(),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: ElevatedButton.icon(
+                      onPressed: isScanning ? null : _scanIngredients,
+                      icon: const Icon(Icons.camera_alt, size: 20),
+                      label: Text(
+                        isScanning ? 'Scanning...' : 'Scan',
+                        style: GoogleFonts.poppins(fontSize: 14),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: ElevatedButton.icon(
+                      onPressed: isScanning ? null : _uploadImage,
+                      icon: const Icon(Icons.upload_file, size: 20),
+                      label: Text(
+                        'Upload',
+                        style: GoogleFonts.poppins(fontSize: 14),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            ElevatedButton.icon(
-              onPressed: isScanning ? null : _finishScanning,
-              icon: const Icon(Icons.check),
-              label: Text(
-                'Finish',
-                style: GoogleFonts.poppins(),
+            const SizedBox(height: 8.0),
+            SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: ElevatedButton.icon(
+                  onPressed: isScanning ? null : _finishScanning,
+                  icon: const Icon(Icons.check, size: 20),
+                  label: Text(
+                    'Done',
+                    style: GoogleFonts.poppins(fontSize: 14),
+                  ),
+                ),
               ),
             ),
           ],

@@ -30,7 +30,12 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
           backgroundColor: Colors.red,
         ),
       );
-      Navigator.of(context).pop();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const IngredientsScannerPage(),
+        ),
+      );
       return;
     }
 
@@ -48,11 +53,17 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Product not found'),
+            content:
+                Text('Product not found, switching to ingredients scanner'),
             backgroundColor: Colors.orange,
           ),
         );
-        Navigator.of(context).pop();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const IngredientsScannerPage(),
+          ),
+        );
       }
     } catch (e) {
       if (!mounted) return;
