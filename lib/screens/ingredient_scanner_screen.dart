@@ -3,6 +3,7 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safeeats/screens/manual_result_screen.dart';
+import 'package:safeeats/services/model_interaction.dart';
 
 class IngredientsScannerPage extends StatefulWidget {
   const IngredientsScannerPage({super.key});
@@ -15,6 +16,30 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
   final List<String> scannedIngredients = [];
   bool isScanning = false;
   final textRecognizer = GoogleMlKit.vision.textRecognizer();
+
+  Future<void> _processAndAddIngredients(List<String> rawIngredients) async {
+    try {
+      // Process ingredients through Python service
+      final processedIngredients =
+          await IngredientProcessor.processIngredients(rawIngredients);
+
+      setState(() {
+        scannedIngredients.addAll(processedIngredients);
+        isScanning = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error processing ingredients. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        isScanning = false;
+      });
+    }
+  }
 
   Future<void> _scanIngredients() async {
     final ImagePicker picker = ImagePicker();
@@ -45,6 +70,8 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
           .map((ingredient) => ingredient.trim())
           .where((ingredient) => ingredient.isNotEmpty)
           .toList();
+
+      await _processAndAddIngredients(newIngredients); // Add this line
 
       setState(() {
         scannedIngredients.addAll(newIngredients);
@@ -87,12 +114,13 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
       // Process the recognized text
       String ingredients = recognizedText.text;
 
-      // Split ingredients by common delimiters
       List<String> newIngredients = ingredients
           .split(RegExp(r'[,.]'))
           .map((ingredient) => ingredient.trim())
           .where((ingredient) => ingredient.isNotEmpty)
           .toList();
+
+      await _processAndAddIngredients(newIngredients);
 
       setState(() {
         scannedIngredients.addAll(newIngredients);
