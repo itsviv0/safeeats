@@ -37,17 +37,10 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
           await textRecognizer.processImage(inputImage);
 
       // Process the recognized text
-      String ingredients = recognizedText.text;
-
-      // Split ingredients by common delimiters
-      List<String> newIngredients = ingredients
-          .split(RegExp(r'[,.]'))
-          .map((ingredient) => ingredient.trim())
-          .where((ingredient) => ingredient.isNotEmpty)
-          .toList();
+      String extrtactedText = recognizedText.text.trim();
 
       setState(() {
-        scannedIngredients.addAll(newIngredients);
+        scannedIngredients.add(extrtactedText);
         isScanning = false;
       });
     } catch (e) {
@@ -85,17 +78,10 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
           await textRecognizer.processImage(inputImage);
 
       // Process the recognized text
-      String ingredients = recognizedText.text;
-
-      // Split ingredients by common delimiters
-      List<String> newIngredients = ingredients
-          .split(RegExp(r'[,.]'))
-          .map((ingredient) => ingredient.trim())
-          .where((ingredient) => ingredient.isNotEmpty)
-          .toList();
+      String extrtactedText = recognizedText.text.trim();
 
       setState(() {
-        scannedIngredients.addAll(newIngredients);
+        scannedIngredients.add(extrtactedText);
         isScanning = false;
       });
     } catch (e) {
