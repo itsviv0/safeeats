@@ -5,7 +5,8 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safeeats/screens/manual_result_screen.dart';
-import 'package:serious_python/serious_python.dart';
+import 'package:safeeats/services/api_sevice.dart';
+import 'package:http/http.dart' as http;
 
 class IngredientsScannerPage extends StatefulWidget {
   const IngredientsScannerPage({super.key});
@@ -18,15 +19,6 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
   final List<String> scannedIngredients = [];
   bool isScanning = false;
   final textRecognizer = GoogleMlKit.vision.textRecognizer();
-
-  Future<List<dynamic>> processText(String inputText) async {
-    // Run Python script with the input text as an environment variable
-    final result = await SeriousPython.run("app/app.zip",
-        environmentVariables: {"INPUT_TEXT": inputText});
-
-    // Parse the output as JSON
-    return jsonDecode(result!);
-  }
 
   Future<void> _scanIngredients() async {
     final ImagePicker picker = ImagePicker();
@@ -50,12 +42,24 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
 
       // Process the recognized text
       String extractedText = recognizedText.text.trim();
-      List<dynamic> processedText = await processText(extractedText);
+      final encodedText = Uri.encodeComponent(extractedText);
+      final url =
+          'https://preprocesstextsafeeats-git-main-itsviv0s-projects.vercel.app/preprocess?ocr_text=$encodedText'; // use ngrok URL if needed
 
-      setState(() {
-        scannedIngredients.add(processedText.toString());
-        isScanning = false;
-      });
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        List<String> processedIngredients =
+            List<String>.from(data['ingredients']);
+
+        setState(() {
+          scannedIngredients.addAll(processedIngredients);
+          isScanning = false;
+        });
+      } else {
+        throw Exception('Failed to load ingredients');
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -92,13 +96,24 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
 
       // Process the recognized text
       String extractedText = recognizedText.text.trim();
+      final encodedText = Uri.encodeComponent(extractedText);
+      final url =
+          'https://preprocesstextsafeeats-git-main-itsviv0s-projects.vercel.app/preprocess?ocr_text=$encodedText'; // use ngrok URL if needed
 
-      List<dynamic> processedText = await processText(extractedText);
+      final response = await http.get(Uri.parse(url));
 
-      setState(() {
-        scannedIngredients.add(processedText.toString());
-        isScanning = false;
-      });
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        List<String> processedIngredients =
+            List<String>.from(data['ingredients']);
+
+        setState(() {
+          scannedIngredients.addAll(processedIngredients);
+          isScanning = false;
+        });
+      } else {
+        throw Exception('Failed to load ingredients');
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
