@@ -37,10 +37,10 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
           await textRecognizer.processImage(inputImage);
 
       // Process the recognized text
-      String extatactedText = recognizedText.text.trim();
+      String extractedText = recognizedText.text.trim();
 
       setState(() {
-        scannedIngredients.add(extatactedText);
+        scannedIngredients.add(extractedText);
         isScanning = false;
       });
     } catch (e) {
@@ -78,10 +78,10 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
           await textRecognizer.processImage(inputImage);
 
       // Process the recognized text
-      String extatactedText = recognizedText.text.trim();
+      String extractedText = recognizedText.text.trim();
 
       setState(() {
-        scannedIngredients.add(extatactedText);
+        scannedIngredients.add(extractedText);
         isScanning = false;
       });
     } catch (e) {
