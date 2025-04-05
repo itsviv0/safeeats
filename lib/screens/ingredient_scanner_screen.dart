@@ -5,8 +5,10 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safeeats/screens/manual_result_screen.dart';
+import 'package:safeeats/services/allergy_service.dart';
 import 'package:safeeats/services/api_sevice.dart';
 import 'package:http/http.dart' as http;
+import 'package:safeeats/services/preprocess_service.dart';
 
 class IngredientsScannerPage extends StatefulWidget {
   const IngredientsScannerPage({super.key});
@@ -42,24 +44,17 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
 
       // Process the recognized text
       String extractedText = recognizedText.text.trim();
-      final encodedText = Uri.encodeComponent(extractedText);
-      final url =
-          'https://preprocesstextsafeeats-git-main-itsviv0s-projects.vercel.app/preprocess?ocr_text=$encodedText'; // use ngrok URL if needed
 
-      final response = await http.get(Uri.parse(url));
+      final extractedIngredients = fetchIngredients(extractedText);
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        List<String> processedIngredients =
-            List<String>.from(data['ingredients']);
+      final allergies = await AllergyService()
+          .detectAllergies(extractedIngredients as List<String>);
 
-        setState(() {
-          scannedIngredients.addAll(processedIngredients);
-          isScanning = false;
-        });
-      } else {
-        throw Exception('Failed to load ingredients');
-      }
+      setState(() {
+        scannedIngredients
+            .addAll(allergies.entries.map((e) => '${e.key}: ${e.value}'));
+        isScanning = false;
+      });
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -96,24 +91,16 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
 
       // Process the recognized text
       String extractedText = recognizedText.text.trim();
-      final encodedText = Uri.encodeComponent(extractedText);
-      final url =
-          'https://preprocesstextsafeeats-git-main-itsviv0s-projects.vercel.app/preprocess?ocr_text=$encodedText'; // use ngrok URL if needed
+      final extractedIngredients = fetchIngredients(extractedText);
 
-      final response = await http.get(Uri.parse(url));
+      final allergies = await AllergyService()
+          .detectAllergies(extractedIngredients as List<String>);
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        List<String> processedIngredients =
-            List<String>.from(data['ingredients']);
-
-        setState(() {
-          scannedIngredients.addAll(processedIngredients);
-          isScanning = false;
-        });
-      } else {
-        throw Exception('Failed to load ingredients');
-      }
+      setState(() {
+        scannedIngredients
+            .addAll(allergies.entries.map((e) => '${e.key}: ${e.value}'));
+        isScanning = false;
+      });
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
