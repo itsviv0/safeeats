@@ -1,15 +1,12 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// Your original function
 Future<List<String>> fetchIngredients(String ocrText) async {
-  // Encode the text for safe URL usage
   final encodedText = Uri.encodeComponent(ocrText);
+  final baseUrl = 'https://preprocesstextsafeeats.vercel.app/';
 
-  // Replace with your API endpoint (Flask localhost or deployed)
-  final baseUrl =
-      'https://preprocesstextsafeeats-git-main-itsviv0s-projects.vercel.app';
-
-  final url = '$baseUrl/ingredients?text=$encodedText';
+  final url = '$baseUrl/preprocess?ocr_text=$encodedText';
 
   final response = await http.get(Uri.parse(url));
 
@@ -17,6 +14,6 @@ Future<List<String>> fetchIngredients(String ocrText) async {
     final data = json.decode(response.body);
     return List<String>.from(data['ingredients']);
   } else {
-    throw Exception('Failed to load ingredients');
+    throw Exception('Failed to load ingredients: ${response.statusCode}');
   }
 }
