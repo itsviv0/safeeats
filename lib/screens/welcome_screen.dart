@@ -10,7 +10,7 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color.fromARGB(255, 225, 255, 219);
+    const Color primaryColor = Color.fromARGB(255, 204, 255, 123);
 
     return Scaffold(
       body: Stack(
