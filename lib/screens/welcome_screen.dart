@@ -9,57 +9,63 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const Color primaryColor = Color(0xFFCDFF7A);
+
     return Scaffold(
       body: NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification notification) {
-          return true;
-        },
+        onNotification: (ScrollNotification notification) => true,
         child: SingleChildScrollView(
           child: Column(
             children: [
               ParallaxBox(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/logo.svg',
-                      height: 150,
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'SafeEats',
-                      style: GoogleFonts.poppins(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
+                height: 500,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 60),
+                      SvgPicture.asset(
+                        'lib/assets/logo.svg',
+                        height: 120,
                       ),
-                    ),
-                    const SizedBox(height: 40),
-                    Text(
-                      'Scan the barcode present on the packaged food',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const BarcodeScannerPage(),
-                          ),
-                        );
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
+                      const SizedBox(height: 12),
+                      Text(
+                        'Scan packaged food to identify hidden allergens.',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Colors.black87,
                         ),
-                        child: Text('Start Scanning'),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 40),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const BarcodeScannerPage(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Start Scanning',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

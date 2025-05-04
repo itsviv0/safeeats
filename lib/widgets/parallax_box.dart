@@ -6,6 +6,7 @@ class ParallaxBox extends StatelessWidget {
   const ParallaxBox({
     super.key,
     required this.child,
+    required int height,
   });
 
   @override
