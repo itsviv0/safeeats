@@ -10,7 +10,7 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFFCDFF7A);
+    const Color primaryColor = Color.fromARGB(255, 225, 255, 219);
 
     return Scaffold(
       body: Stack(
@@ -77,10 +77,11 @@ class WelcomePage extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 60,
+            top: 70,
             right: 20,
             child: IconButton(
-              icon: const Icon(Icons.history),
+              icon: const Icon(Icons.history, size: 32),
+              iconSize: 48,
               tooltip: 'View scanned foods ',
               onPressed: () {
                 Navigator.push(
