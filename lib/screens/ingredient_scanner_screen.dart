@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safeeats/screens/manual_result_screen.dart';
+import 'package:safeeats/services/allergy_service.dart';
+import 'package:safeeats/services/api_sevice.dart';
+import 'package:http/http.dart' as http;
+import 'package:safeeats/services/preprocess_service.dart';
 
 class IngredientsScannerPage extends StatefulWidget {
   const IngredientsScannerPage({super.key});
@@ -37,17 +43,16 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
           await textRecognizer.processImage(inputImage);
 
       // Process the recognized text
-      String ingredients = recognizedText.text;
+      String extractedText = recognizedText.text.trim();
 
-      // Split ingredients by common delimiters
-      List<String> newIngredients = ingredients
-          .split(RegExp(r'[,.]'))
-          .map((ingredient) => ingredient.trim())
-          .where((ingredient) => ingredient.isNotEmpty)
-          .toList();
+      final extractedIngredients = fetchIngredients(extractedText);
+
+      final allergies = await AllergyService()
+          .detectAllergies(extractedIngredients as List<String>);
 
       setState(() {
-        scannedIngredients.addAll(newIngredients);
+        scannedIngredients
+            .addAll(allergies.entries.map((e) => '${e.key}: ${e.value}'));
         isScanning = false;
       });
     } catch (e) {
@@ -85,17 +90,15 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
           await textRecognizer.processImage(inputImage);
 
       // Process the recognized text
-      String ingredients = recognizedText.text;
+      String extractedText = recognizedText.text.trim();
+      final extractedIngredients = fetchIngredients(extractedText);
 
-      // Split ingredients by common delimiters
-      List<String> newIngredients = ingredients
-          .split(RegExp(r'[,.]'))
-          .map((ingredient) => ingredient.trim())
-          .where((ingredient) => ingredient.isNotEmpty)
-          .toList();
+      final allergies = await AllergyService()
+          .detectAllergies(extractedIngredients as List<String>);
 
       setState(() {
-        scannedIngredients.addAll(newIngredients);
+        scannedIngredients
+            .addAll(allergies.entries.map((e) => '${e.key}: ${e.value}'));
         isScanning = false;
       });
     } catch (e) {
