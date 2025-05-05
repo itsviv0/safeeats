@@ -1,13 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safeeats/screens/manual_result_screen.dart';
 import 'package:safeeats/services/allergy_service.dart';
-import 'package:safeeats/services/api_sevice.dart';
-import 'package:http/http.dart' as http;
 import 'package:safeeats/services/preprocess_service.dart';
 
 class IngredientsScannerPage extends StatefulWidget {
@@ -47,13 +43,11 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
 
       final extractedIngredients = await fetchIngredients(extractedText);
 
+      // final allergies = await detectAllergies(extractedIngredients);
       // final allergies = await AllergyService()
       // .detectAllergies(extractedIngredients as List<String>);
 
       setState(() {
-        // scannedIngredients
-        //     .addAll(allergies.entries.map((e) => '${e.key}: ${e.value}'));
-        // isScanning = false;
         extractedIngredients.forEach((ingredient) {
           scannedIngredients.add(ingredient);
         });
@@ -95,14 +89,16 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
 
       // Process the recognized text
       String extractedText = recognizedText.text.trim();
-      final extractedIngredients = fetchIngredients(extractedText);
+      final extractedIngredients = await fetchIngredients(extractedText);
 
-      final allergies = await AllergyService()
-          .detectAllergies(extractedIngredients as List<String>);
+      // final allergies = await detectAllergies(extractedIngredients);
+      // final allergies = await AllergyService()
+      // .detectAllergies(extractedIngredients as List<String>);
 
       setState(() {
-        scannedIngredients
-            .addAll(allergies.entries.map((e) => '${e.key}: ${e.value}'));
+        extractedIngredients.forEach((ingredient) {
+          scannedIngredients.add(ingredient);
+        });
         isScanning = false;
       });
     } catch (e) {
