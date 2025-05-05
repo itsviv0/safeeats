@@ -32,9 +32,27 @@ class WelcomePage extends StatelessWidget {
                             'lib/assets/logo.svg',
                             height: 120,
                           ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Detetect Allergens in Packaged Foods instantly!',
+                            style: GoogleFonts.poppins(
+                              fontSize: 24,
+                              color: Colors.black87,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                           const SizedBox(height: 12),
                           Text(
-                            'Scan packaged food to identify hidden allergens.',
+                            'Keep track of your food allergies and make informed choices.',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Never miss any packaged food you consume. Find all your scanned foods in one place.',
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               color: Colors.black87,
