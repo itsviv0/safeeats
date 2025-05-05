@@ -45,14 +45,18 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
       // Process the recognized text
       String extractedText = recognizedText.text.trim();
 
-      final extractedIngredients = fetchIngredients(extractedText);
+      final extractedIngredients = await fetchIngredients(extractedText);
 
-      final allergies = await AllergyService()
-          .detectAllergies(extractedIngredients as List<String>);
+      // final allergies = await AllergyService()
+      // .detectAllergies(extractedIngredients as List<String>);
 
       setState(() {
-        scannedIngredients
-            .addAll(allergies.entries.map((e) => '${e.key}: ${e.value}'));
+        // scannedIngredients
+        //     .addAll(allergies.entries.map((e) => '${e.key}: ${e.value}'));
+        // isScanning = false;
+        extractedIngredients.forEach((ingredient) {
+          scannedIngredients.add(ingredient);
+        });
         isScanning = false;
       });
     } catch (e) {
