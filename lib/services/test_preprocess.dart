@@ -10,12 +10,32 @@ void main() async {
   final url = '$baseUrl/preprocess?ocr_text=$encodedText';
 
   final response = await http.get(Uri.parse(url));
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    final listIngredients = List<String>.from(data['ingredients']);
-    print(listIngredients);
-    print('Type of listIngredients: ${listIngredients.runtimeType}');
-  } else {
-    print('Error: ${response.statusCode}');
+  // if (response.statusCode == 200) {
+  final data = json.decode(response.body);
+  final listIngredients = data['ingredients'];
+  final List<String> result = [];
+
+  for (final ingredient in listIngredients) {
+    result.add(ingredient.toString());
   }
+
+  print(result);
+
+  // allergy
+
+  const String baseUrlAllergy = 'https://allergydetectionsafeeats.vercel.app/';
+
+  final urlAllergy = Uri.parse('$baseUrlAllergy/allergy');
+
+  final responseAllergy = await http.post(
+    urlAllergy,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'ingredients': result}),
+  );
+  // if (responseAllergy.statusCode == 200) {
+  final resultAllergy = jsonDecode(responseAllergy.body);
+  print('Allergy Results:');
+  resultAllergy.forEach((ingredient, allergy) {
+    print('$ingredient → $allergy');
+  });
 }
