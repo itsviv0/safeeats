@@ -6,6 +6,7 @@ class ParallaxBox extends StatelessWidget {
   const ParallaxBox({
     super.key,
     required this.child,
+    required int height,
   });
 
   @override
@@ -13,7 +14,7 @@ class ParallaxBox extends StatelessWidget {
     return Container(
       height: MediaQuery.of(context).size.height,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color.fromARGB(255, 225, 255, 219),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),

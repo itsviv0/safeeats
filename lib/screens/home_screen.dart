@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -89,41 +90,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const Color primaryColor = Color.fromARGB(255, 225, 255, 219);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('SafeEats')),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton.icon(
-                onPressed: _isPickerActive ? null : getImageFromGallery,
-                icon: const Icon(Icons.photo_library),
-                label: const Text('Pick Ingredients from Gallery'),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: _isPickerActive ? null : getImageFromCamera,
-                icon: const Icon(Icons.camera_alt),
-                label: const Text('Take Photo with Camera'),
-              ),
-              const SizedBox(height: 20),
-              if (_image != null) ...[
-                Image.file(_image!, height: 300),
-                const SizedBox(height: 20),
-              ],
-              if (_isProcessing)
-                const CircularProgressIndicator()
-              else if (_extractedText.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Extracted Text:\n$_extractedText',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
-            ],
-          ),
+      appBar: AppBar(
+        backgroundColor: primaryColor,
+        title: Row(
+          children: [
+            SvgPicture.asset('lib/assets/logo.svg', height: 30),
+            const SizedBox(width: 10),
+            const Text(
+              'SafeEats',
+              style: TextStyle(color: Color.fromARGB(255, 166, 20, 20)),
+            ),
+          ],
+        ),
+        centerTitle: false,
+      ),
+      body: const Center(
+        child: Text(
+          'Welcome to SafeEats Home!',
+          style: TextStyle(fontSize: 18),
         ),
       ),
     );

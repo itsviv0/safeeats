@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safeeats/screens/scanner_screen.dart';
+import 'package:safeeats/screens/scan_history_screen.dart';
 import 'package:safeeats/widgets/parallax_box.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -9,62 +10,108 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const Color primaryColor = Color.fromARGB(255, 204, 255, 123);
+
     return Scaffold(
-      body: NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification notification) {
-          return true;
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              ParallaxBox(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/logo.svg',
-                      height: 150,
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'SafeEats',
-                      style: GoogleFonts.poppins(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    Text(
-                      'Scan the barcode present on the packaged food',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const BarcodeScannerPage(),
+      body: Stack(
+        children: [
+          NotificationListener<ScrollNotification>(
+            onNotification: (ScrollNotification notification) => true,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  ParallaxBox(
+                    height: 500,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 60),
+                          SvgPicture.asset(
+                            'lib/assets/logo.svg',
+                            height: 120,
                           ),
-                        );
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        child: Text('Start Scanning'),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Detetect Allergens in Packaged Foods instantly!',
+                            style: GoogleFonts.poppins(
+                              fontSize: 24,
+                              color: Colors.black87,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Keep track of your food allergies and make informed choices.',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Never miss any packaged food you consume. Find all your scanned foods in one place.',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 40),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              foregroundColor: Colors.black,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const BarcodeScannerPage(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Start Scanning',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            top: 70,
+            right: 20,
+            child: IconButton(
+              icon: const Icon(Icons.history, size: 32),
+              iconSize: 48,
+              tooltip: 'View scanned foods ',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ScanHistoryScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
