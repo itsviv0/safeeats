@@ -3,7 +3,6 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safeeats/screens/manual_result_screen.dart';
-import 'package:safeeats/services/allergy_service.dart';
 import 'package:safeeats/services/preprocess_service.dart';
 
 class IngredientsScannerPage extends StatefulWidget {
@@ -15,6 +14,7 @@ class IngredientsScannerPage extends StatefulWidget {
 
 class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
   final List<String> scannedIngredients = [];
+  String? allergies;
   bool isScanning = false;
   final textRecognizer = GoogleMlKit.vision.textRecognizer();
 
@@ -41,9 +41,12 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
       // Process the recognized text
       String extractedText = recognizedText.text.trim();
 
-      final extractedIngredients = await fetchIngredients(extractedText);
+      final data = await fetchIngredients(extractedText);
 
-      // final allergies = await detectAllergies(extractedIngredients);
+      allergies = data['allergens'].toString();
+      final extractedIngredients = data['ingredients'];
+      allergies = allergies?.substring(1, allergies!.length - 1);
+
       // final allergies = await AllergyService()
       // .detectAllergies(extractedIngredients as List<String>);
 
@@ -89,11 +92,11 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
 
       // Process the recognized text
       String extractedText = recognizedText.text.trim();
-      final extractedIngredients = await fetchIngredients(extractedText);
+      final data = await fetchIngredients(extractedText);
+      allergies = data['allergens'].toString();
+      allergies = allergies?.substring(1, allergies!.length - 1);
 
-      // final allergies = await detectAllergies(extractedIngredients);
-      // final allergies = await AllergyService()
-      // .detectAllergies(extractedIngredients as List<String>);
+      final extractedIngredients = data['ingredients'];
 
       setState(() {
         extractedIngredients.forEach((ingredient) {
@@ -129,7 +132,8 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => ManualResultPage(ingredients: scannedIngredients),
+        builder: (context) => ManualResultPage(
+            ingredients: scannedIngredients, allergens: allergies),
       ),
     );
   }

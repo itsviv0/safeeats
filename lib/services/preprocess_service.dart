@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 // Your original function
-Future<List<String>> fetchIngredients(String ocrText) async {
+Future<dynamic> fetchIngredients(String ocrText) async {
   final encodedText = Uri.encodeComponent(ocrText);
   final baseUrl = 'https://preprocesstextsafeeats.vercel.app/';
 
@@ -12,7 +12,7 @@ Future<List<String>> fetchIngredients(String ocrText) async {
 
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
-    return List<String>.from(data['ingredients']);
+    return data;
   } else {
     throw Exception('Failed to load ingredients: ${response.statusCode}');
   }

@@ -3,10 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 class ManualResultPage extends StatelessWidget {
   final List<String> ingredients;
+  final String? allergens;
 
   const ManualResultPage({
     super.key,
     required this.ingredients,
+    this.allergens,
   });
 
   @override
@@ -27,6 +29,14 @@ class ManualResultPage extends StatelessWidget {
                 'Ingredients List',
                 style: GoogleFonts.poppins(
                   fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Allergens: ${allergens ?? 'None'}',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
