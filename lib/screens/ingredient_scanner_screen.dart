@@ -3,8 +3,8 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safeeats/screens/manual_result_screen.dart';
-import 'package:safeeats/services/allergy_service.dart';
 import 'package:safeeats/services/preprocess_service.dart';
+import 'package:safeeats/services/api_service.dart';
 
 class IngredientsScannerPage extends StatefulWidget {
   const IngredientsScannerPage({super.key});
@@ -17,6 +17,7 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
   final List<String> scannedIngredients = [];
   bool isScanning = false;
   final textRecognizer = GoogleMlKit.vision.textRecognizer();
+  final FoodApiService _apiService = FoodApiService();
 
   Future<void> _scanIngredients() async {
     final ImagePicker picker = ImagePicker();
@@ -41,23 +42,59 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
       // Process the recognized text
       String extractedText = recognizedText.text.trim();
 
+      if (extractedText.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'No text detected. Please try again with a clearer image.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        setState(() {
+          isScanning = false;
+        });
+        return;
+      }
+
       final extractedIngredients = await fetchIngredients(extractedText);
 
-      // final allergies = await detectAllergies(extractedIngredients);
-      // final allergies = await AllergyService()
-      // .detectAllergies(extractedIngredients as List<String>);
+      if (extractedIngredients.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No ingredients found. Please try again.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        setState(() {
+          isScanning = false;
+        });
+        return;
+      }
 
       setState(() {
-        extractedIngredients.forEach((ingredient) {
-          scannedIngredients.add(ingredient);
-        });
+        for (final ingredient in extractedIngredients) {
+          if (!scannedIngredients.contains(ingredient)) {
+            scannedIngredients.add(ingredient);
+          }
+        }
         isScanning = false;
       });
-    } catch (e) {
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error scanning ingredients. Please try again.'),
+        SnackBar(
+          content: Text('Added ${extractedIngredients.length} ingredient(s)'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      debugPrint('Error in _scanIngredients: $e'); // Debug output
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error scanning ingredients: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -89,23 +126,60 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
 
       // Process the recognized text
       String extractedText = recognizedText.text.trim();
+
+      if (extractedText.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'No text detected. Please try again with a clearer image.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        setState(() {
+          isScanning = false;
+        });
+        return;
+      }
+
       final extractedIngredients = await fetchIngredients(extractedText);
 
-      // final allergies = await detectAllergies(extractedIngredients);
-      // final allergies = await AllergyService()
-      // .detectAllergies(extractedIngredients as List<String>);
+      if (extractedIngredients.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No ingredients found. Please try again.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        setState(() {
+          isScanning = false;
+        });
+        return;
+      }
 
       setState(() {
-        extractedIngredients.forEach((ingredient) {
-          scannedIngredients.add(ingredient);
-        });
+        for (final ingredient in extractedIngredients) {
+          if (!scannedIngredients.contains(ingredient)) {
+            scannedIngredients.add(ingredient);
+          }
+        }
         isScanning = false;
       });
-    } catch (e) {
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error processing image. Please try again.'),
+        SnackBar(
+          content: Text('Added ${extractedIngredients.length} ingredient(s)'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      print('Error in _uploadImage: $e'); // Debug output
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error processing image: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -115,7 +189,7 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
     }
   }
 
-  void _finishScanning() {
+  void _finishScanning() async {
     if (scannedIngredients.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -126,12 +200,41 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
       return;
     }
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ManualResultPage(ingredients: scannedIngredients),
-      ),
-    );
+    // Show loading indicator
+    if (mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // Save to database before navigating (but don't block if it fails)
+    try {
+      await _apiService.saveManualScanResult(scannedIngredients);
+      print('Manual scan result saved successfully');
+    } catch (e) {
+      print('Error saving manual scan result: $e');
+      // Don't show error to user, just log it
+    }
+
+    // Close loading dialog
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
+
+    // Navigate to results
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              ManualResultPage(ingredients: scannedIngredients),
+        ),
+      );
+    }
   }
 
   @override

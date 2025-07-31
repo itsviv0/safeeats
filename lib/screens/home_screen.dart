@@ -50,11 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
       final pickedFile = await picker.pickImage(source: ImageSource.camera);
       if (pickedFile != null) {
         final imageFile = File(pickedFile.path);
-        if (imageFile != null) {
-          final imagefile = File(imageFile.path);
-          setState(() => _image = imagefile);
-          await processImage(imagefile);
-        }
+        final imagefile = File(imageFile.path);
+        setState(() => _image = imagefile);
+        await processImage(imagefile);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -4,7 +4,7 @@ import 'dart:convert';
 // Your original function
 Future<List<String>> fetchIngredients(String ocrText) async {
   final encodedText = Uri.encodeComponent(ocrText);
-  final baseUrl = 'https://preprocesstextsafeeats.vercel.app/';
+  final baseUrl = 'https://allergydetectionsafeeats.vercel.app/';
 
   final url = '$baseUrl/preprocess?ocr_text=$encodedText';
 
