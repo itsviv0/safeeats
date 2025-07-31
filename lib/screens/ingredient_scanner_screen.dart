@@ -91,7 +91,7 @@ class _IngredientsScannerPageState extends State<IngredientsScannerPage> {
       );
     } catch (e) {
       if (!mounted) return;
-      print('Error in _scanIngredients: $e'); // Debug output
+      debugPrint('Error in _scanIngredients: $e'); // Debug output
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error scanning ingredients: ${e.toString()}'),
