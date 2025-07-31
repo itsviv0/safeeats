@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safeeats/screens/manual_result_screen.dart';
 import 'package:safeeats/services/preprocess_service.dart';
-import 'package:safeeats/services/api_sevice.dart';
+import 'package:safeeats/services/api_service.dart';
 
 class IngredientsScannerPage extends StatefulWidget {
   const IngredientsScannerPage({super.key});
