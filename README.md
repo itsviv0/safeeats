@@ -74,7 +74,7 @@ CREATE TABLE scan_results (
 
    ```bash
    git clone https://github.com/itsviv0/safeeats.git
-   cd safeeats3
+   cd safeeats
    ```
 
 2. **Install dependencies**
